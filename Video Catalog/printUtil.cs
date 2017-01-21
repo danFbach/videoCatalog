@@ -44,66 +44,7 @@ namespace Video_Catalog
             {
                 color = color.ToLower();
             }
-            switch (color)
-            {
-                ///NORMAL COLORS
-
-                case "blue":
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    break;
-                case "cyan":
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    break;
-                case "gray":
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    break;
-                case "green":
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-                case "magenta":
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
-                case "red":
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case "yellow":
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-
-                ///DARK COLORS
-                case "darkblue":
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
-                    break;
-                case "darkcyan":
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    break;
-                case "darkgray":
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    break;
-                case "darkgreen":
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    break;
-                case "darkmagenta":
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    break;
-                case "darkred":
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    break;
-                case "darkyellow":
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    break;
-                case "white":
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-                case "black":
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.White;
-                    break;
-                ///DEFAULT COLOR
-                default:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-            }
+            pickColor(color);
             Console.Write(_input);
         }
 
@@ -112,73 +53,17 @@ namespace Video_Catalog
             ///RESET BACKGROUND TO BLACK IF BLACK FOREGROUND IS CHOSEN AT ANY POINT
             Console.BackgroundColor = ConsoleColor.Black;
             string returnData;
-            write(br + _input, colorOUT);
+            if (colorOUT != null)
+            {
+                colorIN = colorIN.ToLower();
+            }
+            pickColor(colorOUT);
+            Console.Write(_input);
             if (colorIN != null)
             {
                 colorIN = colorIN.ToLower();
             }
-            switch (colorIN)
-            {
-
-                ///NORMAL COLORS
-
-                case "blue":
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    break;
-                case "cyan":
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    break;
-                case "gray":
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    break;
-                case "green":
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-                case "magenta":
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
-                case "red":
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case "yellow":
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-
-                ///DARK COLORS
-                case "darkblue":
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
-                    break;
-                case "darkcyan":
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    break;
-                case "darkgray":
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    break;
-                case "darkgreen":
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    break;
-                case "darkmagenta":
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    break;
-                case "darkred":
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    break;
-                case "darkyellow":
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    break;
-                case "white":
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-                case "black":
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.White;
-                    break;
-
-                ///DEFAULT COLOR
-                default:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-            }
+            pickColor(colorIN);
             returnData = Console.ReadLine();
             return returnData;
         }
@@ -187,16 +72,30 @@ namespace Video_Catalog
             ///RESET BACKGROUND TO BLACK IF BLACK FOREGROUND IS CHOSEN AT ANY POINT
             Console.BackgroundColor = ConsoleColor.Black;
             ConsoleKeyInfo returnData;
-            write(br + _input, colorOUT);
+            if (colorOUT != null)
+            {
+                colorIN = colorIN.ToLower();
+            }
+            pickColor(colorOUT);
+            Console.Write(_input);
             if (colorIN != null)
             {
                 colorIN = colorIN.ToLower();
             }
-            switch (colorIN)
+            pickColor(colorIN);
+            returnData = Console.ReadKey();
+            if (returnData.Key == ConsoleKey.LeftArrow || returnData.Key == ConsoleKey.RightArrow) { return returnData; }
+            else
             {
-
+                rest(500);
+                return returnData;
+            }
+        }
+        public void pickColor(string color)
+        {
+            switch (color)
+            {
                 ///NORMAL COLORS
-
                 case "blue":
                     Console.ForegroundColor = ConsoleColor.Blue;
                     break;
@@ -218,7 +117,6 @@ namespace Video_Catalog
                 case "yellow":
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     break;
-
                 ///DARK COLORS
                 case "darkblue":
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -248,18 +146,10 @@ namespace Video_Catalog
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.White;
                     break;
-
                 ///DEFAULT COLOR
                 default:
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     break;
-            }
-            returnData = Console.ReadKey();
-            if (returnData.Key == ConsoleKey.LeftArrow || returnData.Key == ConsoleKey.RightArrow) { return returnData; }
-            else
-            {
-                rest(500);
-                return returnData;
             }
         }
         public void proceed()
@@ -267,14 +157,17 @@ namespace Video_Catalog
             Console.ReadKey();
         }
         public void topBar(string title) { write(String.Format("\n\r______________________________________________{0}_____________________________________________\n\r| Index | Name                                                                       | Length         |", title), wht); }
-        public void topBarBlank() { write("\n\r _______________________________________________________________________________________________________\n\r | ", wht);
+        public void topBarBlank()
+        {
+            write("\n\r _______________________________________________________________________________________________________\n\r | ", wht);
             write("Index ", cyan);
             write("|", wht);
             write(" Name ", cyan);
             write("                                                                                       |", wht);
         }
         public void bottomBar() { write("\n\r|______________________________________________________________________________________________________|\n\r", wht); }
-        public void pagedBottomBar(int curPage, int prevPage, int nextPage) {
+        public void pagedBottomBar(int curPage, int prevPage, int nextPage)
+        {
             write("\n\r |_[", wht);
             write(prevPage.ToString(), cyan);
             write("]_____________________________________________[", wht);

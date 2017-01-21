@@ -159,7 +159,7 @@ namespace Video_Catalog
         {
             int select;
             string _select;
-            _select = _pu.rl("Select index #: ", _pu.wht, _pu.cyan);
+            _select = _pu.rl(_pu.br + "Select index #: ", _pu.wht, _pu.cyan);
             bool result = int.TryParse(_select, out select);
             if (result)
             {
