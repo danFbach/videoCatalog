@@ -14,8 +14,13 @@ namespace Video_Catalog
         {
             printUtil _pu = new printUtil();
             _pu.write(_pu.br + _pu.br + " Now playing " + video.Name + ".", _pu.grn);
-            _pu.rest(2500);
+            _pu.rest(1000);
             Process.Start(video.FullName);
+            for (int i = 0;i < 10;i++)
+            {
+                _pu.rest(50);
+                _pu.write(".", _pu.grn);
+            }
         }
     }
 }

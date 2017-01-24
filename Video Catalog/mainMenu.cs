@@ -28,10 +28,6 @@ namespace Video_Catalog
 
         public void initMenu()
         {
-            if (Directory.Exists(networkPath))
-            {
-                networkAvail = true;
-            }
             menu();
         }
         public void menu()
@@ -43,7 +39,7 @@ namespace Video_Catalog
             _pu.write("Movies.", _pu.wht);
             _pu.write(_pu.br + "2) ", _pu.drkcyan);
             _pu.write("Television.", _pu.wht);
-            if (networkAvail)
+            if (Directory.Exists(networkPath))
             {
                 _pu.write(_pu.br + "Network Videos", _pu.cyan);
                 _pu.write(_pu.br + "3) ", _pu.drkcyan);
@@ -59,33 +55,52 @@ namespace Video_Catalog
             switch (_selection.KeyChar)
             {
                 case '1':
-                    videos.AddRange(_fru.get(basePath + @"\Movies"));
-                    videos.AddRange(_fru.get(basePathD + @"\Movies"));
-                    videos = videos.OrderBy(x => x.FullName).ToList();
-                    FileInfo movie = displayTitles(videos, movi);
-                    _vpu.play(movie);
+                    string[] localDirects = { basePath + @"\Movies", basePathD + @"\Movies" };
+                    string selectedMovie = _fru.getVideoPackage(localDirects);
+                    if(selectedMovie != null)
+                    {
+                        FileInfo _selectedFile = new FileInfo(selectedMovie);
+                        _vpu.play(_selectedFile);
+                    }
+                    else
+                    {
+                        _pu.write(_pu.br + "Aborted explorer. Returning to main menu.", _pu.red);
+                        _pu.rest(1500);
+                    }
                     _pu.resetConsole();
                     menu();
                     break;
                 case '2':
-                    _fru.getVideoPackage(basePath + @"\Television");
-                    _fru.getVideoPackage(basePathD + @"\Television");
-                    videos.AddRange(_fru.get(basePath + @"\Television"));
-                    videos.AddRange(_fru.get(basePathD + @"\Television"));
-                    videos = videos.OrderBy(x => x.FullName).ToList();
-                    FileInfo episode = displayTitles(videos, tele);
-                    _vpu.play(episode);
+                    string[] _localDirects = { basePath + @"\Television", basePathD + @"\Television" };
+                    string selectedEpisode = _fru.getVideoPackage(_localDirects);
+                    if(selectedEpisode != null)
+                    {
+                        FileInfo episode = new FileInfo(selectedEpisode);
+                        _vpu.play(episode);
+
+                    }
+                    else
+                    {
+                        _pu.write(_pu.br + "Aborted explorer. Returning to main menu.", _pu.red);
+                        _pu.rest(1500);
+                    }
                     _pu.resetConsole();
                     menu();
                     break;
                 case '3':
                     if (networkAvail)
                     {
-                        string Movie = _fru.getVideoPackage(networkPath + @"\Movies");
+                        string[] videoPaths = { networkPath + @"\Movies" };
+                        string Movie = _fru.getVideoPackage(videoPaths);
                         if (Movie != null)
                         {
                             FileInfo _movie = new FileInfo(Movie);
                             _vpu.play(_movie);
+                        }
+                        else
+                        {
+                            _pu.write(_pu.br + "Aborted explorer. Returning to main menu.", _pu.red);
+                            _pu.rest(1500);
                         }
                     }
                     _pu.resetConsole();
@@ -94,11 +109,17 @@ namespace Video_Catalog
                 case '4':
                     if (networkAvail)
                     {
-                        string _episode = _fru.getVideoPackage(networkPath + @"\Television");
+                        string[] videoPaths = { networkPath + @"\Television" };
+                        string _episode = _fru.getVideoPackage(videoPaths);
                         if (_episode != null)
                         {
                             FileInfo _Episode = new FileInfo(_episode);
                             _vpu.play(_Episode);
+                        }
+                        else
+                        {
+                            _pu.write(_pu.br + "Aborted explorer. Returning to main menu.", _pu.red);
+                            _pu.rest(1500);
                         }
                     }
                     _pu.resetConsole();
@@ -107,7 +128,18 @@ namespace Video_Catalog
                 case '5':
                     if (networkAvail)
                     {
-
+                        string[] videoPaths = { networkPath + @"\Stand up Comedy" };
+                        string _episode = _fru.getVideoPackage(videoPaths);
+                        if (_episode != null)
+                        {
+                            FileInfo _Episode = new FileInfo(_episode);
+                            _vpu.play(_Episode);
+                        }
+                        else
+                        {
+                            _pu.write(_pu.br + "Aborted explorer. Returning to main menu.", _pu.red);
+                            _pu.rest(1500);
+                        }
                     }
                     _pu.resetConsole();
                     menu();
@@ -120,72 +152,6 @@ namespace Video_Catalog
                     _pu.resetConsole();
                     menu();
                     break;
-            }
-        }
-        public FileInfo displayMovieByGenre(videoPackage _genre)
-        {
-            FileInfo _video = displayTitles(_genre.videos, movi);
-            return _video;
-        }
-        public FileInfo displayTitles(List<FileInfo> videos, string videoType)
-        {
-            _pu.topBar(videoType);
-            int count = 1;
-            foreach (FileInfo video in videos)
-            {
-                if (video.Extension == ".avi" || video.Extension == ".mkv" || video.Extension == ".mp4")
-                {
-                    string videoName = "";
-                    string _count = "\n\r| " + count + ")" + space;
-                    _count = _count.Substring(0, 10);
-                    _pu.write(_count + "| ", _pu.wht);
-                    if (video.Name.ToCharArray().Count() > 75)
-                    {
-                        videoName = video.Name.Substring(0, 72) + "...";
-                    }
-                    else
-                    {
-                        videoName = (video.Name + space).Substring(0, 75);
-                    }
-                    _pu.write(videoName, _pu.cyan);
-                    _pu.write(@"| Length         |", _pu.wht);
-                    count += 1;
-                }
-            }
-            FileInfo _video = getSelection(videos);
-            return _video;
-        }
-        public FileInfo getSelection(List<FileInfo> videos)
-        {
-            int select;
-            string _select;
-            _select = _pu.rl(_pu.br + "Select index #: ", _pu.wht, _pu.cyan);
-            bool result = int.TryParse(_select, out select);
-            if (result)
-            {
-                if(select > 0 && select <= videos.Count())
-                {
-                    FileInfo thisVideo = videos[select - 1];
-                    if(thisVideo != null)
-                    {
-                        return thisVideo;
-                    }
-                    else
-                    {
-                        _pu.write(_pu.br + _select + " is not a valid selection.", _pu.gray);
-                        return getSelection(videos);
-                    }
-                }
-                else
-                {
-                    _pu.write(_pu.br + _select + " is not a valid selection.", _pu.gray);
-                    return getSelection(videos);
-                }
-            }
-            else
-            {
-                _pu.write(_pu.br + _select + " is not a valid selection.", _pu.gray);
-                return getSelection(videos);
             }
         }
     }

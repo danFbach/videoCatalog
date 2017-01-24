@@ -17,7 +17,7 @@ namespace Video_Catalog
         public void multiplePaths(List<string> paths)
         {
             List<string> series = new List<string>();
-            foreach(string path in paths)
+            foreach (string path in paths)
             {
                 series.AddRange(getSubfolders(path));
             }
@@ -25,26 +25,31 @@ namespace Video_Catalog
             List<pagedData> seriesPages = createPages(series, false);
             string seriesPath = displayPages(seriesPages, 0);
             List<string> seasons = getSubfolders(seriesPath);
-            if(seasons.Count() > 0)
+            if (seasons.Count() > 0)
             {
                 List<pagedData> seasonPages = createPages(seasons, false);
                 string selectedSeason = displayPages(seasonPages, 0);
             }
             List<string> episodes = getVideoPaths(seriesPath);
         }
-        public string getVideoPackage(string directory)
+        public string getVideoPackage(string[] directories)
         {
             videoPackage videoList = new videoPackage();
-            string[] pathType = directory.Split('\\');
-            if (pathType.First() == "Z:")
+            string[] pathType = directories[0].Split('\\');
+            if (pathType.Last() == "Movies")
             {
-                if (pathType.Last() == "Movies")
+                List<string> movies = new List<string>();
+                this.directories = new List<string>();
+                List<string> genres = new List<string>();
+                string selectedGenre = "";
+                if (directories[0].Split(':').First().ToLower() == "z")
                 {
-                    List<string> movies = new List<string>();
-                    directories = new List<string>();
-                    List<string> genres = getSubfolders(directory);
+                    foreach (string d in directories)
+                    {
+                        genres.AddRange(getSubfolders(d));
+                    }
                     List<pagedData> genreList = createPages(genres, false);
-                    string selectedGenre = displayPages(genreList, 0);
+                    selectedGenre = displayPages(genreList, 0);
                     if (selectedGenre == null) { return null; }
                     videoList.genreName = selectedGenre.Split('\\').Last();
                     string[] genreSubFolders = Directory.GetDirectories(selectedGenre);
@@ -52,46 +57,60 @@ namespace Video_Catalog
                     {
                         movies.AddRange(getVideoPaths(folder));
                     }
-                    movies = movies.OrderBy(x => x.Split('\\').Last()).ToList();
-                    List<pagedData> movieList = createPages(movies, true);
-                    string selectedMovie = displayPages(movieList, 0);
-                    return selectedMovie;
                 }
-                else if (pathType.Last() == "Television")
+                else if(directories[0].Split(':').First().ToLower() == "c" || directories[0].Split(':').First().ToLower() == "d")
                 {
-                    string selectSeason = null;
-                    string episode = "";
-                    List<string> episodes = new List<string>();
-                    List<string> series = getSeries(directory);
-                    List<pagedData> pagedVideoPackage = createPages(series, false);
-                    string selectSeries = displayPages(pagedVideoPackage, 0);
-                    if (selectSeries == null) { return null; }
-                    List<string> _seasons = getSeasons(selectSeries);
-                    if (_seasons.Count() > 0)
+                    foreach(string folder in directories)
                     {
-                        List<pagedData> seasonPack = createPages(_seasons, false);
-                        selectSeason = displayPages(seasonPack, 0);
-                        if (selectSeason == null) { return null; }
+                        movies.AddRange(getVideoPaths(folder));
                     }
-                    if (selectSeason != null)
+                }
+                movies = movies.OrderBy(x => x.Split('\\').Last()).ToList();
+                List<pagedData> movieList = createPages(movies, true);
+                string selectedMovie = displayPages(movieList, 0);
+                return selectedMovie;
+            }
+            else if (pathType.Last() == "Television")
+            {
+                string selectSeason = null;
+                string episode = "";
+                List<string> episodes = new List<string>();
+                List<string> series = new List<string>();
+                foreach(string folder in directories)
+                {
+                    if(folder.Split(':').First().ToLower() == "c" || folder.Split(':').First().ToLower() == "d")
                     {
-                        episodes = getVideoPaths(selectSeason);
-                        List<pagedData> _episodes = createPages(episodes, true);
-                        episode = displayPages(_episodes, 0);
-                        if (episode == null) { return null; }
+                        series.AddRange(Directory.GetDirectories(folder));
                     }
-                    else
+                    else if(folder.Split(':').First().ToLower() == "z")
                     {
-                        episodes = getVideoPaths(selectSeries);
-                        List<pagedData> _episodes = createPages(episodes, true);
-                        episode = displayPages(_episodes, 0);
+                        series.AddRange(getSeries(folder));
                     }
-                    return episode;
+                }
+                List<pagedData> pagedVideoPackage = createPages(series, false);
+                string selectSeries = displayPages(pagedVideoPackage, 0);
+                if (selectSeries == null) { return null; }
+                List<string> _seasons = getSeasons(selectSeries);
+                if (_seasons.Count() > 0)
+                {
+                    List<pagedData> seasonPack = createPages(_seasons, false);
+                    selectSeason = displayPages(seasonPack, 0);
+                    if (selectSeason == null) { return null; }
+                }
+                if (selectSeason != null)
+                {
+                    episodes = getVideoPaths(selectSeason);
+                    List<pagedData> _episodes = createPages(episodes, true);
+                    episode = displayPages(_episodes, 0);
+                    if (episode == null) { return null; }
                 }
                 else
                 {
-                    return null;
+                    episodes = getVideoPaths(selectSeries);
+                    List<pagedData> _episodes = createPages(episodes, true);
+                    episode = displayPages(_episodes, 0);
                 }
+                return episode;
             }
             else
             {
